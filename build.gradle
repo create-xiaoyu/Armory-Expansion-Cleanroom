@@ -23,17 +23,14 @@ assertProperty 'mod_id'
 assertProperty 'mod_name'
 
 assertSubProperties 'use_access_transformer', 'access_transformer_locations'
-assertSubProperties 'use_mixins', 'mixin_booter_version', 'mixin_refmap'
 assertSubProperties 'is_coremod', 'coremod_includes_mod', 'coremod_plugin_class_name'
 assertSubProperties 'use_asset_mover', 'asset_mover_version'
 
-setDefaultProperty 'use_modern_java_syntax', false, false
 setDefaultProperty 'generate_sources_jar', true, false
 setDefaultProperty 'generate_javadocs_jar', true, false
 setDefaultProperty 'use_dependency_at_files', true, true
 setDefaultProperty 'minecraft_username', true, 'Developer'
 setDefaultProperty 'extra_jvm_args', false, ''
-setDefaultProperty 'extra_tweak_classes', false, ''
 
 version = propertyString('mod_version')
 group = propertyString('root_package')
@@ -59,35 +56,12 @@ configurations {
     embed
     implementation.extendsFrom(embed)
 }
-/*
-minecraft {
-    mcVersion.set('1.12.2')
 
-    useDependencyAccessTransformers.set(propertyBool('use_dependency_at_files'))
-
-    username.set(propertyString('minecraft_username'))
-    
-    // Add any additional tweaker classes here
-    extraTweakClasses.addAll(propertyStringList('extra_tweak_classes'))
-
-    // Add various JVM arguments here for runtime
-    def args = ['-ea:' + group]
-    if (propertyBool('use_mixins')) {
-        args << '-Dmixin.hotSwap=true'
-        args << '-Dmixin.checks.interfaces=true'
-        args << '-Dmixin.debug.export=true'
-    }
-    extraRunJvmArguments.addAll(args)
-    extraRunJvmArguments.addAll(propertyStringList('extra_jvm_args'))
-
-}
-*/
 unimined.minecraft {
     version "1.12.2"
 
     mappings {
         mcp("stable", "39-1.12")
-
     }
 
     cleanroom {
@@ -95,21 +69,11 @@ unimined.minecraft {
             accessTransformer = '/src/main/resources/' +  propertyString('access_transformer_locations')
         }
         loader "0.3.0-alpha"
-        runs {
-            config("client", {
-                args += '-Dmixin.hotSwap=true';
-                args += '-Dmixin.checks.interfaces=true'
-                args += '-Dmixin.debug.export=true'
-            })
-        }
+        runs.config("client", {args += extra_jvm_args.split(" ")})
+        runs.config("server", {args += extra_jvm_args.split(" ")})
+        runs.auth.username = minecraft_username
     }
 
-    remap(jar) {
-        mixinRemap {
-            enableBaseMixin()
-            enableMixinExtra()
-        }
-    }
 
 }
 
@@ -268,30 +232,12 @@ String parserChangelog() {
     return parsedChangelog
 }
 
-tasks.register('generateMixinJson') {
-    group 'cleanroom helpers'
-    def missingConfig = propertyStringList('mixin_configs').findAll(config -> !file("src/main/resources/mixins.${config}.json").exists())
-    onlyIf {
-        if (propertyBool('use_mixins') && propertyBool('generate_mixins_json')) {
-            return !missingConfig.empty
-        }
-        return false
-    }
-    doLast {
-        for (String mixinConfig : missingConfig) {
-            def file = file("src/main/resources/mixins.${mixinConfig}.json")
-            file << """{\n\t"package": "",\n\t"required": true,\n\t"refmap": "${propertyString('mixin_refmap')}",\n\t"target": "@env(DEFAULT)",\n\t"minVersion": "0.8.5",\n\t"compatibilityLevel": "JAVA_8",\n\t"mixins": [],\n\t"server": [],\n\t"client": []\n}"""
-        }
-    }
-}
-
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
 tasks.register('cleanroomAfterSync') {
     group 'cleanroom helpers'
-    dependsOn 'generateMixinJson'//, 'injectTags'
 }
 
 idea.project.settings {
