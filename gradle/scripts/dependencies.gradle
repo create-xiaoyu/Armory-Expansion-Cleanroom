@@ -39,7 +39,8 @@ dependencies {
     // runtimeOnly = runtime dependency
     // compileOnly = compile time dependency
     // annotationProcessor = annotation processing dependencies
-    // embed = bundle dependencies into final output artifact (no relocation)
+    // contain = bundle dependency jars into final artifact, will extract them in mod loading. Please only do this to non-mod dependencies.
+    // shadow = bundle dependencies into shadow output artifact (relocation configurable in shadowJar task)
 
     // Transitive dependencies:
     // (Dependencies that your dependency depends on)
