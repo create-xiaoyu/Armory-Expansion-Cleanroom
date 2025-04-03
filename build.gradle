@@ -19,6 +19,8 @@ assertProperty 'root_package'
 assertProperty 'mod_id'
 assertProperty 'mod_name'
 
+injectTags()
+
 assertSubProperties 'use_access_transformer', 'access_transformer_locations'
 assertSubProperties 'is_coremod', 'coremod_includes_mod', 'coremod_plugin_class_name'
 assertSubProperties 'use_asset_mover', 'asset_mover_version'
@@ -193,20 +195,6 @@ idea {
     }
 }
 
-compileJava {
-    doFirst {
-        def target = new File("${rootProject.projectDir}/src/main/java/${root_package.replace('.', '/')}/${mod_id}/Reference.java")
-        def template = new File("${rootProject.projectDir}/template/Reference.java")
-        def replaceMap = [$mod_id : mod_id, $mod_name : mod_name, $mod_version : mod_version]
-        target.withWriter { def writer ->
-            template.eachLine { def line ->
-                replaceMap.each {if (line.contains(it.key)) line = line.replace(it.key, it.value)}
-                writer.write(line + "\n");
-            }
-        }
-    }
-}
-
 compileTestJava {
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_21
 }
@@ -234,6 +222,18 @@ String parserChangelog() {
         throw new GradleException('publish_with_changelog is true, but the changelog for the latest version is empty!')
     }
     return parsedChangelog
+}
+
+def injectTags() {
+    var target = new File("${rootProject.projectDir}/src/main/java/${root_package.replace('.', '/')}/${mod_id}/Reference.java")
+    var template = new File("${rootProject.projectDir}/template/Reference.java")
+    var replaceMap = [$mod_id : mod_id, $mod_name : mod_name, $mod_version : mod_version]
+    target.withWriter { var writer ->
+        template.eachLine { var line ->
+            replaceMap.each {if (line.contains(it.key)) line = line.replace(it.key, it.value)}
+            writer.write(line + "\n");
+        }
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
