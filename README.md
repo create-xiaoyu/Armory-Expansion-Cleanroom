@@ -9,7 +9,6 @@ Mixin in Cleanroom only need 1~3 configs, MixinBooter API is deprecated, check m
 
 **WARNING**: These features are missing:
 - Applying dependencies AT. Since even JEI has many ATs, this mean you will have to test your mod in production launchers.
-- Mixin in dev. Current approach rely on manifest file to get mixins, which won't work in runClient. You could still try to add them manually by calling Mixins.addConfiguration() though
 
 ## Branches
 There are 3 branches available:
