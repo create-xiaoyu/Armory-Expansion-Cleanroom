@@ -91,6 +91,14 @@ repositories {
         name 'CleanroomMC Maven'
         url 'https://maven.cleanroommc.com'
     }
+    maven {
+        name 'DVS1 Maven FS'
+        url 'https://dvs1.progwml6.com/files/maven'
+    }
+    maven {
+        name 'CurseForge'
+        url 'https://cursemaven.com'
+    }
 }
 
 dependencies {
@@ -101,6 +109,21 @@ dependencies {
         testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     }
+
+    // 地幔依赖
+    implementation "slimeknights.mantle:Mantle:1.12-${mantle_build}"
+
+    // 匠魂依赖
+    implementation "slimeknights:TConstruct:1.12.2-${tinkers_build}"
+
+    // 匠魂盔甲依赖
+    implementation "curse.maven:ConstructArmory-${construct_armory_project_id}:${construct_armory_file_id}"
+
+    //冰与火传说依赖
+    implementation "curse.maven:ConstructArmory-${iceandfire_project_id}:${iceandfire_file_id}"
+
+    //超能物质依赖
+    implementation "curse.maven:ConstructArmory-${matteroverdrive_project_id}:${matteroverdrive_file_id}"
 }
 
 apply from: 'gradle/scripts/dependencies.gradle'
